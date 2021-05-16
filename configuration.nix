@@ -1,71 +1,40 @@
 { config, pkgs, ... }:
-let
-  myCustomLayout = pkgs.writeText "xkb-layout" ''
-    keycode 104 = Return
-  '';
-in
+
 {
   imports =
     [
       ./hardware-configuration.nix
+      ./wifi.nix
+      ./gui.nix
+      ./chuwi.nix
+      ./laptop.nix
     ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "louis-lapbook";
-
   time.timeZone = "Europe/Paris";
 
-  networking.interfaces.wlp1s0.useDHCP = true;
-
-  services.xserver = {
-    enable = true;
-    desktopManager.xterm.enable = false;
-    displayManager.defaultSession = "none+i3";
-    windowManager.i3 = {
-      enable = true;
-      package = pkgs.i3-gaps;
-      extraPackages = with pkgs; [
-        # todo rofi & polybar
-        i3status
-        i3lock
-        polybar
-        rofi
-      ];
-    };
-  };
-  nixpkgs.config = {
-    packageOverrides = pkgs: rec {
-      polybar = pkgs.polybar.override {
-        i3Support = true;
-      };
-    };
-  };
-
   services.flatpak.enable = true;
-  xdg.portal.enable = true;
+  xdg.portal.enable = true; # needed for flatpak
 
   virtualisation.docker.enable = true;
 
-  services.xserver.libinput.enable = true;
-  services.xserver.libinput.middleEmulation = true;
-  services.xserver.libinput.tapping = true; 
-
-  services.xserver.displayManager.sessionCommands = "${pkgs.xorg.xmodmap}/bin/xmodmap ${myCustomLayout}";
-
-  programs.light.enable = true;
-
   sound.enable = true;
   hardware.pulseaudio.enable = true;
-  boot.extraModprobeConfig = ''
-    options snd slots=snd-hda-intel
-  '';
 
   users.users.louis = {
     isNormalUser = true;
     home = "/home/louis";
     extraGroups = [ "wheel" "video" "audio" "docker" ]; # Enable ‘sudo’ for the user.
+  };
+
+  users.users.sylvain = {
+    isNormalUser = true;
+    openssh.authorizedKeys.keys = [ 
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC0xv9D2ytKzxCErVyITLo3jfiDU3O7kLOg42qhSnWJ/yEtuxM3h2y7W3uQ/Nv2FqFE9rpF6es5rmfTqQ9x064ADWKhqeVmGQuUlTcs4NLZ7sISUfSRO6b5lD7UGLWZNTgR/aFpmgIfZzwXGDFavFeGZHWrVdB9Jic+3Xwcej57wUhGRQOvSsiA/BA+naAbf8oj+HKGNRa+ZWX1YRstJwsnlRsmc4W1ugHtRKMrvTZnDZpH/wpRJTSMAuuv/ZDihwM5S97HgQ0zp1UNUTWSr+8RuufVYMEbLGp9Bcf3Sr1l9KzFrPcGw5vDTT+C5p9f8EbWjjdGhl/ukqEf4KSOBU2X+pkKZr05m66kxwTU8gVjg1hCAhuxYyja6AODfgseNzOgIP9gFI5kycjVPGGsdYeZK6bCPoqQPqMBA1x6h9R2aMDW8tqcHdfnroS67rDs/tu8qL6IaH+tGDZNsPC8Kt28+IggbevDFqLjEN87RQK4XQF3h2TxgYbbeAB/62g31i8= sylvain@sylvain" 
+    ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -80,13 +49,6 @@ in
     fantasque-sans-mono
   ];
 
-  networking.wireless.enable = true;
-  networking.wireless.networks = {
-    "SFR-8e10_5GHz" = {
-      psk = "QCLPCMF4M2M1";
-    };
-  };
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
@@ -94,6 +56,5 @@ in
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "20.09"; # Did you read the comment?
-
 }
 
