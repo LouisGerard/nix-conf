@@ -1,7 +1,8 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  networking.interfaces.wlp1s0.useDHCP = true;
+  networking.interfaces.wlan0.useDHCP = true;
+  networking.wireless.interfaces = [ "wlan0" ];
   networking.wireless.enable = true;
   networking.wireless.userControlled.enable = true;
   networking.wireless.networks = {
@@ -11,9 +12,12 @@
     "HONOR View20" = {
       psk = "8f8aac332581";
     };
-    "iPhone de Sylvain" = {
-      psk = "sylvain13021996";
+    "Blue Forest - Guests" = {
+      psk = "welcometoblueforest";
     };
+#    "iPhone de Sylvain" = {
+#      psk = "sylvain13021996";
+#    };
     "Bbox-F2B1299A" = {
       psk = "291A13D3D57A4C1C335753C93A9AE3";
     };
