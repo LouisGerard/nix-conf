@@ -21,6 +21,9 @@
     "Bbox-F2B1299A" = {
       psk = "291A13D3D57A4C1C335753C93A9AE3";
     };
+    # "freebox_Monique" = {
+    #   psk = "MichelMoniqueColomba13*";
+    # };
   };
   services.openssh = {
     enable = true;
